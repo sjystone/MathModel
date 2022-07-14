@@ -1,8 +1,10 @@
 """
 ---* created at 2022.7.11 by Stone *---
 
-use Simulated Annealing algorithm to solve multiple variable function optimization problem
+use Simulated Annealing algorithm to solve multiple integer variable function optimization problem
 
+only restrict the random numbers to integers when general the initial X
+the algorithm is not related to integer, so we can rounding the result to obtain integer solution
 """
 
 import numpy as np
@@ -60,7 +62,7 @@ class SimulatedAnnealing():
 
         X_init = np.zeros((self.var_num))
         for i in range(self.var_num):
-            X_init[i] = random.uniform(self.var_min[i], self.var_max[i])
+            X_init[i] = random.randint(self.var_min[i], self.var_max[i])
 
         # --- initialize --- #
 
@@ -161,9 +163,3 @@ if __name__ == '__main__':
     plt.plot(SA.P_inferior_acc_, label='probability of inferior acceptation')
     plt.legend()
     plt.show()
-
-
-
-
-
-

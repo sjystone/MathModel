@@ -1,14 +1,24 @@
 """
 ---* created at 2022.7.11 by Stone *---
 
-use Simulated Annealing algorithm to solve multiple variable function optimization problem
+use simulated annealing based on penalty function to solve constrained linear problem
+
+
+------ Penalty function ------
+
+convert constraints penalty function and add it to the target function
+
+In the external iteration, the value of  penalty factor gradually increase
+the limit of the result of each iteration is the  solution of the problem
 
 """
+
 
 import numpy as np
 import random
 import matplotlib.pyplot as plt
 import copy
+import math
 
 
 class SimulatedAnnealing():
@@ -16,7 +26,8 @@ class SimulatedAnnealing():
     apply for simulated annealing algorithm of multiple variable function optimization problem
     """
 
-    def __init__(self, var_num, var_min, var_max, temp_init, temp_final, markov, alpha, lr, lr_decay_fac=0.99):
+    def __init__(self, var_num, var_min, var_max, temp_init, temp_final, markov,
+                 alpha, lr, lr_decay_fac=0.99, penalty_factor=1):
 
         self.var_num = var_num                                  # number of variable
         self.var_min = [var_min for _ in range(var_num)]        # lower limit of search space
@@ -37,15 +48,15 @@ class SimulatedAnnealing():
 
         self.lr_decay_fac = lr_decay_fac                        # lr decay factor
 
+        self.penalty_factor = penalty_factor                    # penalty function factor
 
     def func(self, X):
         """
-        define the target function
+        define the target function with penalty
         """
-        fx = 0.0
-        for i in range(len(X)):
-            fx += X[i] * np.sin(np.sqrt(np.abs(X[i])))
-        fx = 418.9829 * len(X) - fx
+        p1 = math.pow((max(0, 6 * X[0] + 5 * X[1] - 60)), 2)
+        p2 = math.pow((max(0, 10 * X[0] + 20 * X[1] - 150)), 2)
+        fx = -(10 * X[0] + 9 * X[1]) + self.penalty_factor * (p1 + p2)
         return fx
 
     def lr_decay(self):
@@ -80,6 +91,8 @@ class SimulatedAnnealing():
             high_quality_num = 0
             inferior_acc_num = 0
             inferior_ref_num = 0
+
+            self.penalty_factor = itr + 1
 
             for _ in range(self.markov):
 
@@ -143,7 +156,7 @@ if __name__ == '__main__':
 
     # SA = SimulatedAnnealing(var_num=10, var_min=-1000, var_max=1000,
     #                         temp_init=100, temp_final=1, markov=100, alpha=0.98, lr=0.5)
-    SA = SimulatedAnnealing(var_num=10, var_min=-500, var_max=500,
+    SA = SimulatedAnnealing(var_num=2, var_min=-500, var_max=500,
                             temp_init=100, temp_final=1, markov=100, alpha=0.98, lr=0.4)
     SA.solve(123456789101112)
 
@@ -161,9 +174,5 @@ if __name__ == '__main__':
     plt.plot(SA.P_inferior_acc_, label='probability of inferior acceptation')
     plt.legend()
     plt.show()
-
-
-
-
 
 
